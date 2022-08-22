@@ -3,25 +3,31 @@ import { config } from '../../../../config';
 describe('Order shirts tests', () => {
   let account;
   let basePage;
+  let products;
+  let orderActions;
   before(() => {
     cy.visit('/');
     basePage = PageFactory.basePage;
     account = PageFactory.Account;
-    basePage.getSingleElementOfCategoriesList('T-shirts');
+    products = PageFactory.Products;
+    orderActions = PageFactory.OrderActions;
+    basePage.goToSpecyficProductTab('T-shirts');
   });
 
   it(
     'All added shirts should be visible in the cart',
     { defaultCommandTimeout: 10000 },
     () => {
-      basePage.getSingleElementOfProductList(0);
-      basePage.addElementToCart();
+      products.clickSingleElementOfProductList(0);
+      orderActions.addElementToCart();
       cy.wait(9000);
-      basePage.getSpecificButton('Continue shopping ');
-      basePage.modifyItem('change', '5');
-      basePage.modifyItem('select', '2');
+      orderActions.clickSpecificButton('Continue shopping ');
+      orderActions.modifyItem('change', '5');
+      orderActions.modifyItem('select', '2');
 
-      basePage.putQuantntityOfItem.should('be.visible').and('have.value', '5');
+      orderActions.putQuantntityOfItem
+        .should('be.visible')
+        .and('have.value', '5');
     }
   );
 
@@ -29,17 +35,17 @@ describe('Order shirts tests', () => {
     'should add only one item on list t cart',
     { defaultCommandTimeout: 10000 },
     () => {
-      basePage.addElementToCart();
+      orderActions.addElementToCart();
       cy.wait(9000);
-      basePage.getSpecificButton('Proceed to checkout');
+      orderActions.clickSpecificButton('Proceed to checkout');
       cy.wait(9000);
-      basePage.deleteItemFromList(1);
-      basePage.rowsInsideSummaryTable.should('have.length', 1);
+      orderActions.deleteItemFromList(1);
+      orderActions.rowsInsideSummaryTable.should('have.length', 1); /////////////////////////////////
     }
   );
 
   it('should be logged on account', { defaultCommandTimeout: 10000 }, () => {
-    basePage.getSpecificoperationFromNavigation('Proceed to checkout');
+    orderActions.clickSpecificButtonFromNavigation('Proceed to checkout');
     account.makeAccountAction(
       'type in login panel',
       'email',
@@ -58,10 +64,10 @@ describe('Order shirts tests', () => {
     'should select terms of and procedd to checkout',
     { defaultCommandTimeout: 10000 },
     () => {
-      basePage.getSpecificoperationFromNavigation('Proceed to checkout');
+      orderActions.clickSpecificButtonFromNavigation('Proceed to checkout');
       cy.wait(9000);
-      basePage.selectAgreeInTerms();
-      basePage.getSpecificoperationFromNavigation('Proceed to checkout');
+      orderActions.selectAgreeInTerms();
+      orderActions.clickSpecificButtonFromNavigation('Proceed to checkout');
       cy.wait(9000);
       account.pageTitle
         .should('be.visible')
@@ -73,9 +79,9 @@ describe('Order shirts tests', () => {
     'should selec payment method and confiorm order',
     { defaultCommandTimeout: 10000 },
     () => {
-      basePage.getPaymentMethod('bankwire');
-      basePage.getSpecificoperationFromNavigation('I confirm my order');
-      basePage.orderConfirmation
+      orderActions.selectPaymentMethod('bankwire');
+      orderActions.clickSpecificButtonFromNavigation('I confirm my order');
+      orderActions.orderConfirmation
         .should('be.visible')
         .and('have.text', 'Your order on My Store is complete.');
     }

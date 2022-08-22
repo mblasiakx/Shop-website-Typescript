@@ -3,29 +3,35 @@ import { config } from '../../../../config';
 describe('Sumer dresses tests', () => {
   let basePage;
   let account;
+  let products;
+  let orderActions;
   before(() => {
     cy.visit('/');
     basePage = PageFactory.basePage;
     account = PageFactory.Account;
-    basePage.getSingleElementOfCategoriesList('Dresses');
-    basePage.getSingleElementOfSubcategoriesList('Summer Dresses');
+    products = PageFactory.Products;
+    orderActions = PageFactory.OrderActions;
+    basePage.goToSpecyficProductTab('Dresses');
+    products.goToSpecyficSubcategories('Summer Dresses');
   });
 
   it(
     'All added dresses should be visible in the cart',
     { defaultCommandTimeout: 10000 },
     () => {
-      basePage.getSingleElementOfProductList(2);
-      basePage.addElementToCart();
+      products.clickSingleElementOfProductList(2);
+      orderActions.addElementToCart();
       cy.wait(9000);
-      basePage.getSpecificButton('Proceed to checkout');
+      orderActions.clickSpecificButton('Proceed to checkout');
 
-      basePage.putQuantntityOfItem.should('be.visible').and('have.value', '1');
+      orderActions.putQuantntityOfItem
+        .should('be.visible')
+        .and('have.value', '1');
     }
   );
 
   it('should be logged on account', { defaultCommandTimeout: 10000 }, () => {
-    basePage.getSpecificoperationFromNavigation('Proceed to checkout');
+    orderActions.clickSpecificButtonFromNavigation('Proceed to checkout');
     account.makeAccountAction(
       'type in login panel',
       'email',
@@ -44,10 +50,10 @@ describe('Sumer dresses tests', () => {
     'should select terms of and procedd to checkout',
     { defaultCommandTimeout: 10000 },
     () => {
-      basePage.getSpecificoperationFromNavigation('Proceed to checkout');
+      orderActions.clickSpecificButtonFromNavigation('Proceed to checkout');
       cy.wait(9000);
-      basePage.selectAgreeInTerms();
-      basePage.getSpecificoperationFromNavigation('Proceed to checkout');
+      orderActions.selectAgreeInTerms();
+      orderActions.clickSpecificButtonFromNavigation('Proceed to checkout');
       cy.wait(9000);
       account.pageTitle
         .should('be.visible')
@@ -59,9 +65,9 @@ describe('Sumer dresses tests', () => {
     'should selec payment method and confiorm order',
     { defaultCommandTimeout: 10000 },
     () => {
-      basePage.getPaymentMethod('bankwire');
-      basePage.getSpecificoperationFromNavigation('I confirm my order');
-      basePage.orderConfirmation
+      orderActions.selectPaymentMethod('bankwire');
+      orderActions.clickSpecificButtonFromNavigation('I confirm my order');
+      orderActions.orderConfirmation
         .should('be.visible')
         .and('have.text', 'Your order on My Store is complete.');
     }
